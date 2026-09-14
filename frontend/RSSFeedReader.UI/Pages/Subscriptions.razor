@@ -1,0 +1,119 @@
+@page "/"
+@using System.Net
+@using System.Net.Http.Json
+@using System.Text.Json
+@inject HttpClient Http
+
+<PageTitle>Subscriptions | RSSFeedReader</PageTitle>
+
+<section class="subscriptions-view">
+    <header class="subscriptions-header">
+        <h1>Subscriptions</h1>
+        <span class="subscription-count">@subscriptions.Length total</span>
+    </header>
+
+    <form class="subscription-form" @onsubmit="AddAsync" @onsubmit:preventDefault>
+        <label for="feed-url">Feed URL</label>
+        <div class="subscription-entry">
+            <textarea id="feed-url" rows="2" @bind="input" @bind:event="oninput" disabled="@isBusy"></textarea>
+            <button type="submit" class="btn btn-primary" disabled="@(isBusy || string.IsNullOrWhiteSpace(input))">Add</button>
+        </div>
+    </form>
+
+    @if (isBusy)
+    {
+        <p role="status">Loading...</p>
+    }
+    @if (message is not null)
+    {
+        <p class="subscription-error" role="alert">@message</p>
+    }
+    @if (hasLoaded && subscriptions.Length == 0)
+    {
+        <p class="subscription-empty">No subscriptions yet.</p>
+    }
+    <ul class="subscription-list" aria-label="Subscriptions">
+        @foreach (var subscription in subscriptions)
+        {
+            <li>@subscription</li>
+        }
+    </ul>
+</section>
+
+@code {
+    private string input = string.Empty;
+    private string[] subscriptions = [];
+    private bool isBusy;
+    private bool hasLoaded;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isBusy = true;
+        try
+        {
+            await LoadAsync();
+        }
+        catch (Exception exception) when (IsRequestFailure(exception))
+        {
+            message = "Could not load subscriptions.";
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private async Task AddAsync()
+    {
+        if (isBusy || string.IsNullOrWhiteSpace(input))
+        {
+            return;
+        }
+
+        isBusy = true;
+        message = null;
+        var value = input;
+        var added = false;
+        try
+        {
+            using var response = await Http.PostAsJsonAsync("subscriptions", new { url = value });
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                message = response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.UnsupportedMediaType
+                    ? "Could not add this subscription."
+                    : "The addition could not be confirmed.";
+                return;
+            }
+
+            added = true;
+            await LoadAsync();
+            input = string.Empty;
+        }
+        catch (Exception exception) when (IsRequestFailure(exception))
+        {
+            message = added
+                ? "Subscription added, but the list could not be updated."
+                : "The addition could not be confirmed.";
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        var snapshot = await Http.GetFromJsonAsync<string?[]>("subscriptions");
+        if (snapshot is null || snapshot.Any(value => value is null))
+        {
+            throw new JsonException("Invalid subscription snapshot.");
+        }
+
+        subscriptions = snapshot.Select(value => value!).ToArray();
+        hasLoaded = true;
+    }
+
+    private static bool IsRequestFailure(Exception exception) =>
+        exception is HttpRequestException or JsonException or OperationCanceledException;
+}

@@ -1,0 +1,14 @@
+bin/
+obj/
+packages/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.log
+.env*

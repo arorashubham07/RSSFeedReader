@@ -235,7 +235,17 @@ Run on each target OS and fill evidence during implementation, not during planni
 
 | Platform | SDK / browser | Build and audit | HTTP / browser / security checks | Outcome |
 |----------|---------------|-----------------|---------------------------------|---------|
-| Windows | Not yet recorded | Not run | Not run | Pending |
+| Windows | SDK 9.0.318; browser not tested | Not run | Not run | Blocked at T001: .NET 10 SDK unavailable |
+### Prerequisite Check: 2026-09-13
+
+- `dotnet --version` returned `9.0.318`.
+- `dotnet --list-sdks` returned only `9.0.318 [C:\Program Files\dotnet\sdk]`.
+- The specification-quality checklist passed: 16 checked items, zero unchecked items.
+- T001 requires stopping when the .NET 10 SDK is unavailable. T001 remains unchecked;
+  dependent tasks have not started, and no application files have been generated.
+- Install a supported, serviced .NET 10 SDK, then rerun the two SDK commands from the
+  repository root before resuming. No downgrade to .NET 9 is authorized by the plan.
+- The requested T001-T050 range maps to the existing T001-T027 list; T028-T050 do not exist.
 | macOS | Not yet recorded | Not run | Not run | Pending |
 | Linux | Not yet recorded | Not run | Not run | Pending |
 

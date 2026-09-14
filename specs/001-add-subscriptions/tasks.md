@@ -39,7 +39,7 @@ precede it; final verification does not introduce more product features. All tas
 
 **Purpose**: Establish the specified .NET 10 baseline and separate application projects.
 
-- [ ] T001 Verify a supported serviced .NET 10 SDK using `dotnet --version` and `dotnet --list-sdks`, record its exact version and prerequisites in README.md, and stop with a prerequisite blocker if unavailable; use the C# 14/net10.0 baseline from specs/001-add-subscriptions/plan.md rather than selecting another architecture.
+- [X] T001 Verify a supported serviced .NET 10 SDK using `dotnet --version` and `dotnet --list-sdks`, record its exact version and prerequisites in README.md, and stop with a prerequisite blocker if unavailable; use the C# 14/net10.0 baseline from specs/001-add-subscriptions/plan.md rather than selecting another architecture.
 - [ ] T002 [P] Scaffold the Minimal API project at backend/RSSFeedReader.Api/RSSFeedReader.Api.csproj using the .NET 10 `webapi` template with no authentication, no runtime OpenAPI dependency, and no HTTPS requirement; keep dependencies limited to the planned framework. Depends on T001.
 - [ ] T003 [P] Scaffold the standalone Blazor WebAssembly project at frontend/RSSFeedReader.UI/RSSFeedReader.UI.csproj using the .NET 10 `blazorwasm` template without authentication; do not use `blazor` or legacy hosted WASM. Depends on T001; independent of T002.
 - [ ] T004 Enable nullable reference analysis and warning-free builds in backend/RSSFeedReader.Api/RSSFeedReader.Api.csproj and frontend/RSSFeedReader.UI/RSSFeedReader.UI.csproj, restore both projects with compatible serviced 10.0 packages, and record exact restore/build commands and results in specs/001-add-subscriptions/quickstart.md. Depends on T002 and T003.
